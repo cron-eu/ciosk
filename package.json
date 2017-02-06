@@ -43,6 +43,8 @@
   "private": true,
   "license": "UNLICENSED",
   "dependencies": {
-    "leitstand": "^0.1.1"
+    "leitstand": "^0.1.1",
+    "leitstand-jira": "^0.1.0",
+    "yargs": "^6.6.0"
   }
 }
