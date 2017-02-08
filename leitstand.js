@@ -3,6 +3,13 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .plugin('github', function () {
+      leitstand.widget('github-events',
+        this.widget('activity', 'getEventsForOrg', {
+          org: 'cron-eu'
+        })
+      );
+    })
     .plugin('jira', {
       jira: {
         host: 'cron-eu.atlassian.net',
@@ -23,6 +30,18 @@ module.exports = function (leitstand) {
             };
           };
         });
+    })
+    .plugin('faker', {
+      locale: 'de',
+      spec: false,
+    }, function () {
+      leitstand.widget('faker-widget',
+        this.widget({
+          name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
+          company: '{{company.companyName}}, {{address.country}}',
+          motto: '{{hacker.phrase}}'
+        })
+      );
     })
     .plugin('demo', {
       widget: function () {
