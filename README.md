@@ -13,7 +13,7 @@ npm install
 ## Usage
 
 ```bash
-leitstand start --jira-username="<USERNAME>" --jira-password="<PASSWORD>"
+leitstand start --gitlab-token="<TOKEN>" --jira-username="<USERNAME>" --jira-password="<PASSWORD>"
 ```
 
 You can now visit the [default dashboard](http://localhost:9000/dashboards/default)

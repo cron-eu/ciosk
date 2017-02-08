@@ -3,9 +3,19 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .plugin('gitlab', {
+      gitlab: {
+        api: 'https://gitlab.cron.eu/api/v3',
+        privateToken: argv['gitlab-token']
+      }
+    }, function () {
+      leitstand.widget('gitlab-projects',
+        this.widget('projects.list')
+      );
+    })
     .plugin('github', function () {
       leitstand.widget('github-events',
-        this.widget('activity', 'getEventsForOrg', {
+        this.widget('activity.getEventsForOrg', {
           org: 'cron-eu'
         })
       );
@@ -20,7 +30,7 @@ module.exports = function (leitstand) {
       }
     }, function () {
       leitstand.widget('open-jira-issues',
-        this.widget('search', 'search', {
+        this.widget('search.search', {
           jql: 'status in (Open, "In Progress")',
           maxResults: 0
         }), function() {
