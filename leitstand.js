@@ -4,7 +4,7 @@ module.exports = function (leitstand) {
 
   leitstand
     .plugin('gitlab', {
-      gitlab: {
+      settings: {
         api: 'https://gitlab.cron.eu/api/v3',
         privateToken: argv['gitlab-token']
       }
@@ -21,7 +21,7 @@ module.exports = function (leitstand) {
       );
     })
     .plugin('jira', {
-      jira: {
+      settings: {
         host: 'cron-eu.atlassian.net',
         basic_auth: {
           username: argv['jira-username'],
