@@ -10,7 +10,7 @@ module.exports = function (leitstand) {
     })
     .widget('mopidy-volume', {
       plugin: 'mopidy',
-      spec: false,
+      schedule: false,
       methods: {
         name: 'mixer.getVolume',
         key: 'volume'
@@ -25,7 +25,20 @@ module.exports = function (leitstand) {
       }
     })
     .widget('gitlab-projects', {plugin: 'gitlab', methods: 'projects.list'})
-    .widget('github-events', {plugin: 'github', methods: {name: 'activity.getEventsForOrg', opts: {org: 'cron-eu'}}})
+    .widget('github-events', {
+      plugin: 'github',
+      methods: [
+      {
+        name: 'activity.getEventsForOrg',
+        opts: {org: 'cron-eu'},
+        key: 'cron'
+      },
+      {
+        name: 'activity.getEventsForOrg',
+        opts: {org: 'leitstandjs'},
+        key: 'leitstand'
+      }]
+    })
     .plugin('jira', {
       settings: {
         host: 'cron-eu.atlassian.net',
@@ -57,7 +70,7 @@ module.exports = function (leitstand) {
     })
     .widget('faker-widget', {
       plugin: 'faker',
-      spec: false,
+      schedule: false,
       methods: {
         name: 'fake',
         opts: {
@@ -68,7 +81,7 @@ module.exports = function (leitstand) {
       }
     })
     .plugin('demo', {
-      spec: {
+      schedule: {
         second: [
           Math.floor((Math.random() * 60)),
           Math.floor((Math.random() * 60))
