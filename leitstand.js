@@ -3,23 +3,21 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .plugin('mopidy', {
+      settings: {
+        webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
+      }
+    })
+    .widget('mopidy-volume', {plugin: 'mopidy', event: 'event:volumeChanged'})
+    .widget('mopidy-current-track', {plugin: 'mopidy', method: 'playback.getCurrentTlTrack'})
     .plugin('gitlab', {
       settings: {
         api: 'https://gitlab.cron.eu/api/v3',
         privateToken: argv['gitlab-token']
       }
-    }, function () {
-      leitstand.widget('gitlab-projects',
-        this.widget('projects.list')
-      );
     })
-    .plugin('github', function () {
-      leitstand.widget('github-events',
-        this.widget('activity.getEventsForOrg', {
-          org: 'cron-eu'
-        })
-      );
-    })
+    .widget('gitlab-projects', {plugin: 'gitlab', event: 'projects.list'})
+    .widget('github-events', {plugin: 'github', method: 'activity.getEventsForOrg', opts: {org: 'cron-eu'}})
     .plugin('jira', {
       settings: {
         host: 'cron-eu.atlassian.net',
@@ -28,30 +26,34 @@ module.exports = function (leitstand) {
           password: argv['jira-password']
         }
       }
-    }, function () {
-      leitstand.widget('open-jira-issues',
-        this.widget('search.search', {
-          jql: 'status in (Open, "In Progress")',
-          maxResults: 0
-        }), function() {
-          this.filter = function(values) {
-            return {
-              open: values.total
-            };
-          };
-        });
+    })
+    .widget('open-jira-issues', {
+      plugin: 'jira',
+      method: 'search.search',
+      opts: {
+        jql: 'status in (Open, "In Progress")',
+        maxResults: 0
+      },
+      filter: function(values) {
+        return {
+          open: values.total
+        };
+      }
     })
     .plugin('faker', {
-      locale: 'de',
+      settings: {
+        locale: 'de'
+      }
+    })
+    .widget('faker-widget', {
+      plugin: 'faker',
       spec: false,
-    }, function () {
-      leitstand.widget('faker-widget',
-        this.widget({
-          name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
-          company: '{{company.companyName}}, {{address.country}}',
-          motto: '{{hacker.phrase}}'
-        })
-      );
+      method: 'fake',
+      opts: {
+        name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
+        company: '{{company.companyName}}, {{address.country}}',
+        motto: '{{hacker.phrase}}'
+      }
     })
     .plugin('demo', {
       widget: function () {
