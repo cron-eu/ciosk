@@ -6,7 +6,7 @@ module.exports = function (leitstand) {
     .widget('request-demo', {
       plugin: 'request',
       methods: {
-        name: 'get',
+        name: 'head',
         opts: 'http://cron.eu'
       },
       filter: function (values) {
