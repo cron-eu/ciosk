@@ -3,6 +3,16 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .plugin('slack', {
+      settings: {
+        botToken: argv['slack-bot-token']
+      }
+    })
+    .widget('slack-demo', {
+      plugin: 'slack',
+      // see https://github.com/slackapi/node-slack-sdk/blob/master/lib/clients/events/rtm.js
+      events: 'message'
+    })
     .plugin('mopidy', {
       settings: {
         webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'

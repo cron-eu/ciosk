@@ -49,6 +49,7 @@
     "leitstand-gitlab": "^0.1.0",
     "leitstand-jira": "^0.1.0",
     "leitstand-mopidy": "^0.1.0",
+    "leitstand-slack": "^0.1.0",
     "yargs": "^6.6.0"
   }
 }
