@@ -11,26 +11,21 @@ module.exports = function (leitstand) {
     .widget('mopidy-volume', {
       plugin: 'mopidy',
       spec: false,
-      method: 'mixer.getVolume',
-      event: 'event:volumeChanged',
-      filter: function (values) {
-        if (!values.volume) {
-          values = {
-            volume: values
-          }
-        }
-        return values;
-      }
+      methods: {
+        name: 'mixer.getVolume',
+        key: 'volume'
+      },
+      events: 'event:volumeChanged'
     })
-    .widget('mopidy-current-track', {plugin: 'mopidy', method: 'playback.getCurrentTlTrack'})
+    .widget('mopidy-current-track', {plugin: 'mopidy', methods: 'playback.getCurrentTlTrack'})
     .plugin('gitlab', {
       settings: {
         api: 'https://gitlab.cron.eu/api/v3',
         privateToken: argv['gitlab-token']
       }
     })
-    .widget('gitlab-projects', {plugin: 'gitlab', event: 'projects.list'})
-    .widget('github-events', {plugin: 'github', method: 'activity.getEventsForOrg', opts: {org: 'cron-eu'}})
+    .widget('gitlab-projects', {plugin: 'gitlab', methods: 'projects.list'})
+    .widget('github-events', {plugin: 'github', methods: {name: 'activity.getEventsForOrg', opts: {org: 'cron-eu'}}})
     .plugin('jira', {
       settings: {
         host: 'cron-eu.atlassian.net',
@@ -42,10 +37,12 @@ module.exports = function (leitstand) {
     })
     .widget('open-jira-issues', {
       plugin: 'jira',
-      method: 'search.search',
-      opts: {
-        jql: 'status in (Open, "In Progress")',
-        maxResults: 0
+      methods: {
+        name: 'search.search',
+        opts: {
+          jql: 'status in (Open, "In Progress")',
+          maxResults: 0
+        }
       },
       filter: function(values) {
         return {
@@ -61,11 +58,13 @@ module.exports = function (leitstand) {
     .widget('faker-widget', {
       plugin: 'faker',
       spec: false,
-      method: 'fake',
-      opts: {
-        name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
-        company: '{{company.companyName}}, {{address.country}}',
-        motto: '{{hacker.phrase}}'
+      methods: {
+        name: 'fake',
+        opts: {
+          name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
+          company: '{{company.companyName}}, {{address.country}}',
+          motto: '{{hacker.phrase}}'
+        }
       }
     })
     .plugin('demo', {
@@ -87,6 +86,6 @@ module.exports = function (leitstand) {
         });
       }
     })
-    .widget('demo-widget', {plugin: 'demo', method: 'random'})
+    .widget('demo-widget', {plugin: 'demo', methods: 'random'})
     .dashboard('default', {widgets: '.*'});
 };
