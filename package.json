@@ -51,6 +51,7 @@
     "leitstand-mopidy": "^0.1.0",
     "leitstand-request": "^0.1.0",
     "leitstand-slack": "^0.1.0",
+    "leitstand-socket.io": "^0.1.0",
     "leitstand-twitter": "^0.1.0",
     "yargs": "^6.6.0"
   }

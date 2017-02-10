@@ -3,6 +3,25 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .plugin('socket.io', {
+      settings: {
+        uri: 'http://localhost:9000/leitstand',
+        opts: {
+          query: 'dashboard=default'
+        }
+      }
+    })
+    .callback(function () {
+      leitstand.widget('self', {
+        plugin: 'socket.io',
+        events: 'widget:set',
+        filter: function (values) {
+          // prevent endless loop
+          // just demo
+          return true;
+        }
+      });
+    })
     .widget('request-demo', {
       plugin: 'request',
       methods: {
