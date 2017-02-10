@@ -3,6 +3,16 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .widget('request-demo', {
+      plugin: 'request',
+      methods: {
+        name: 'get',
+        opts: 'http://cron.eu'
+      },
+      filter: function (values) {
+        return values;
+      }
+    })
     .plugin('twitter', {
       settings: {
         consumer_key: argv['twitter-consumer-key'],
