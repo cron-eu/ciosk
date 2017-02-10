@@ -3,6 +3,22 @@ module.exports = function (leitstand) {
   var argv = require('yargs').argv;
 
   leitstand
+    .plugin('twitter', {
+      settings: {
+        consumer_key: argv['twitter-consumer-key'],
+        consumer_secret: argv['twitter-consumer-secret'],
+        access_token_key: argv['twitter-access-token-key'],
+        access_token_secret: argv['twitter-access-token-secret']
+      }
+    })
+    .widget('twitter-demo', {
+      plugin: 'twitter',
+      methods: [
+      {
+        name: 'get',
+        opts: ['statuses/user_timeline', {screen_name: 'cron_eu'}]
+      }]
+    })
     .plugin('slack', {
       settings: {
         botToken: argv['slack-bot-token']

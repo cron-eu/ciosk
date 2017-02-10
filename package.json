@@ -50,6 +50,7 @@
     "leitstand-jira": "^0.1.0",
     "leitstand-mopidy": "^0.1.0",
     "leitstand-slack": "^0.1.0",
+    "leitstand-twitter": "^0.1.0",
     "yargs": "^6.6.0"
   }
 }

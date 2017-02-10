@@ -13,7 +13,15 @@ npm install
 ## Usage
 
 ```bash
-leitstand start --slack-bot-token="<TOKEN>" --gitlab-token="<TOKEN>" --jira-username="<USERNAME>" --jira-password="<PASSWORD>"
+leitstand start \
+--twitter-consumer-key="<KEY>" \
+--twitter-consumer-secret="<SECRET>" \
+--twitter-access-token-key="<KEY>" \
+--twitter-access-token-secret="<SECRET>" \
+--slack-bot-token="<TOKEN>" \
+--gitlab-token="<TOKEN>" \
+--jira-username="<USERNAME>" \
+--jira-password="<PASSWORD>" \
 ```
 
 You can now visit the [default dashboard](http://localhost:9000/dashboards/default)
