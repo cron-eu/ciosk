@@ -8,7 +8,20 @@ module.exports = function (leitstand) {
         webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
       }
     })
-    .widget('mopidy-volume', {plugin: 'mopidy', event: 'event:volumeChanged'})
+    .widget('mopidy-volume', {
+      plugin: 'mopidy',
+      spec: false,
+      method: 'mixer.getVolume',
+      event: 'event:volumeChanged',
+      filter: function (values) {
+        if (!values.volume) {
+          values = {
+            volume: values
+          }
+        }
+        return values;
+      }
+    })
     .widget('mopidy-current-track', {plugin: 'mopidy', method: 'playback.getCurrentTlTrack'})
     .plugin('gitlab', {
       settings: {
