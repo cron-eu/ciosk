@@ -1,6 +1,20 @@
+var fs = require('fs');
+var path = require('path');
+var yargs = require('yargs');
+
 module.exports = function (leitstand) {
 
-  var argv = require('yargs').argv;
+  var opts = yargs
+              .default('config', './config.json')
+              .argv;
+
+  var config = path.resolve(opts.config);
+
+  if (fs.existsSync(config)) {
+    leitstand.logger.info('Loading config from "%s"', config);
+    config = require(config);
+    opts = Object.assign(config, opts);
+  }
 
   leitstand
     .plugin('socket.io', {
@@ -34,10 +48,10 @@ module.exports = function (leitstand) {
     })
     .plugin('twitter', {
       settings: {
-        consumer_key: argv['twitter-consumer-key'],
-        consumer_secret: argv['twitter-consumer-secret'],
-        access_token_key: argv['twitter-access-token-key'],
-        access_token_secret: argv['twitter-access-token-secret']
+        consumer_key: opts['twitter-consumer-key'],
+        consumer_secret: opts['twitter-consumer-secret'],
+        access_token_key: opts['twitter-access-token-key'],
+        access_token_secret: opts['twitter-access-token-secret']
       }
     })
     .widget('twitter-demo', {
@@ -50,7 +64,7 @@ module.exports = function (leitstand) {
     })
     .plugin('slack', {
       settings: {
-        botToken: argv['slack-bot-token']
+        botToken: opts['slack-bot-token']
       }
     })
     .widget('slack-demo', {
@@ -76,7 +90,7 @@ module.exports = function (leitstand) {
     .plugin('gitlab', {
       settings: {
         api: 'https://gitlab.cron.eu/api/v3',
-        privateToken: argv['gitlab-token']
+        privateToken: opts['gitlab-token']
       }
     })
     .widget('gitlab-projects', {plugin: 'gitlab', methods: 'projects.list'})
@@ -98,8 +112,8 @@ module.exports = function (leitstand) {
       settings: {
         host: 'cron-eu.atlassian.net',
         basic_auth: {
-          username: argv['jira-username'],
-          password: argv['jira-password']
+          username: opts['jira-username'],
+          password: opts['jira-password']
         }
       }
     })

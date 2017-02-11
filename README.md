@@ -13,15 +13,16 @@ npm install
 ## Usage
 
 ```bash
+// NOTE: you can also store your credentials in config.json and run leistand start OR leistand start --config ~/my-other-config.json
 leitstand start \
---twitter-consumer-key="<KEY>" \
---twitter-consumer-secret="<SECRET>" \
---twitter-access-token-key="<KEY>" \
---twitter-access-token-secret="<SECRET>" \
---slack-bot-token="<TOKEN>" \
---gitlab-token="<TOKEN>" \
---jira-username="<USERNAME>" \
---jira-password="<PASSWORD>" \
+--twitter-consumer-key <KEY> \
+--twitter-consumer-secret <SECRET> \
+--twitter-access-token-key <KEY> \
+--twitter-access-token-secret <SECRET> \
+--slack-bot-token <TOKEN> \
+--gitlab-token <TOKEN> \
+--jira-username <USERNAME> \
+--jira-password <PASSWORD>
 ```
 
 You can now visit the [default dashboard](http://localhost:9000/dashboards/default)
