@@ -25,16 +25,43 @@ module.exports = function (leitstand) {
         }
       }
     })
-    .callback(function () {
-      leitstand.widget('self', {
-        plugin: 'socket.io',
-        events: 'widget:set',
-        filter: function (values) {
-          // prevent endless loop
-          // just demo
-          return true;
+    .plugin('twitter', {
+      settings: {
+        consumer_key: opts['twitter-consumer-key'],
+        consumer_secret: opts['twitter-consumer-secret'],
+        access_token_key: opts['twitter-access-token-key'],
+        access_token_secret: opts['twitter-access-token-secret']
+      }
+    })
+    .plugin('slack', {
+      settings: {
+        botToken: opts['slack-bot-token']
+      }
+    })
+    .plugin('mopidy', {
+      settings: {
+        webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
+      }
+    })
+    .plugin('gitlab', {
+      settings: {
+        api: 'https://gitlab.cron.eu/api/v3',
+        privateToken: opts['gitlab-token']
+      }
+    })
+    .plugin('jira', {
+      settings: {
+        host: 'cron-eu.atlassian.net',
+        basic_auth: {
+          username: opts['jira-username'],
+          password: opts['jira-password']
         }
-      });
+      }
+    })
+    .plugin('faker', {
+      settings: {
+        locale: 'de'
+      }
     })
     .widget('request-demo', {
       plugin: 'request',
@@ -46,81 +73,61 @@ module.exports = function (leitstand) {
         return values;
       }
     })
-    .plugin('twitter', {
-      settings: {
-        consumer_key: opts['twitter-consumer-key'],
-        consumer_secret: opts['twitter-consumer-secret'],
-        access_token_key: opts['twitter-access-token-key'],
-        access_token_secret: opts['twitter-access-token-secret']
-      }
-    })
     .widget('twitter-demo', {
-      plugin: 'twitter',
       methods: [
       {
+        plugin: 'twitter',
         name: 'get',
         opts: ['statuses/user_timeline', {screen_name: 'cron_eu'}]
       }]
     })
-    .plugin('slack', {
-      settings: {
-        botToken: opts['slack-bot-token']
-      }
-    })
     .widget('slack-demo', {
-      plugin: 'slack',
       // see https://github.com/slackapi/node-slack-sdk/blob/master/lib/clients/events/rtm.js
+      plugin: 'slack',
       events: 'message'
     })
-    .plugin('mopidy', {
-      settings: {
-        webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
-      }
-    })
-    .widget('mopidy-volume', {
-      plugin: 'mopidy',
+    /*
+    .widget('mopidy', {
       schedule: false,
-      methods: {
+      plugin: 'mopidy',
+      methods: [
+      {
         name: 'mixer.getVolume',
         key: 'volume'
       },
+      {
+        name: 'playback.getCurrentTlTrack',
+        key: 'track'
+      }],
       events: 'event:volumeChanged'
     })
-    .widget('mopidy-current-track', {plugin: 'mopidy', methods: 'playback.getCurrentTlTrack'})
-    .plugin('gitlab', {
-      settings: {
-        api: 'https://gitlab.cron.eu/api/v3',
-        privateToken: opts['gitlab-token']
-      }
+    */
+    .widget('gitlab-projects', {
+      plugin: 'gitlab',
+      methods: 'projects.list'
     })
-    .widget('gitlab-projects', {plugin: 'gitlab', methods: 'projects.list'})
     .widget('github-events', {
       plugin: 'github',
       methods: [
       {
         name: 'activity.getEventsForOrg',
-        opts: {org: 'cron-eu'},
+        opts: {
+          org: 'cron-eu'
+        },
         key: 'cron'
       },
       {
         name: 'activity.getEventsForOrg',
-        opts: {org: 'leitstandjs'},
+        opts: {
+          org: 'leitstandjs'
+        },
         key: 'leitstand'
       }]
     })
-    .plugin('jira', {
-      settings: {
-        host: 'cron-eu.atlassian.net',
-        basic_auth: {
-          username: opts['jira-username'],
-          password: opts['jira-password']
-        }
-      }
-    })
     .widget('open-jira-issues', {
-      plugin: 'jira',
       methods: {
         name: 'search.search',
+        plugin: 'jira',
         opts: {
           jql: 'status in (Open, "In Progress")',
           maxResults: 0
@@ -132,16 +139,11 @@ module.exports = function (leitstand) {
         };
       }
     })
-    .plugin('faker', {
-      settings: {
-        locale: 'de'
-      }
-    })
     .widget('faker-widget', {
-      plugin: 'faker',
       schedule: false,
       methods: {
         name: 'fake',
+        plugin: 'faker',
         opts: {
           name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
           company: '{{company.companyName}}, {{address.country}}',
@@ -149,25 +151,7 @@ module.exports = function (leitstand) {
         }
       }
     })
-    .plugin('demo', {
-      schedule: {
-        second: [
-          Math.floor((Math.random() * 60)),
-          Math.floor((Math.random() * 60))
-        ].filter(function(el, i, a){
-          return i == a.indexOf(el);
-        }).sort(function(a, b) {
-          return a - b;
-        })
-      },
-      api: function (settings, callback) {
-        callback({
-          random: function() {
-            return Math.floor((Math.random() * 100) + 1);
-          }
-        });
-      }
-    })
-    .widget('demo-widget', {plugin: 'demo', methods: 'random'})
-    .dashboard('default', {widgets: '.*'});
+    .dashboard('default', {
+      widgets: '.*'
+    });
 };
