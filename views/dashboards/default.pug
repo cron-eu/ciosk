@@ -1,153 +1,20 @@
 doctype html
 html(lang="en")
   head
+    meta(charset="utf-8")
     title Dashboard: #{dashboard.id}
-    link(href='//maxcdn.bootstrapcdn.com/bootswatch/3.3.7/lumen/bootstrap.min.css', rel='stylesheet')
-    script(src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js')
-    script(src='//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js')
+  body
+    #dashboard
     script(src='/socket.io/socket.io.js')
-    script(src='//cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js')
-    script(src='//cdnjs.cloudflare.com/ajax/libs/countup.js/1.8.1/countUp.min.js')
-    style.
-      html,
-      body,
-      #dashboard {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-      }
-      .col1,
-      .col2,
-      .box7,
-      .box11 {
-        float: left;
-      }
-      .col1 {
-        width: 20%;
-        height: 100%;
-      }
-      .col1 > div {
-        width: 100%;
-        height: 25%;
-      }
-      .col2 {
-        width: 65%;
-        height: 100%;
-      }
-      .box6 {
-        float: right;
-        width: 47.5%;
-        height: 60%;
-      }
-      .box5,
-      .box8 {
-        width: 52.5%;
-      }
-      .box5 {
-        height: 30%;
-      }
-      .box8 {
-        height: 30%;
-      }
-      .box9 {
-        height: 20%;
-      }
-      .box10,
-      .box11 {
-        height: 20%;
-      }
-      .box7,
-      .box11 {
-        width: 15%;
-      }
-      .box7 {
-        height: 80%;
-      }
-      .box {
-        padding: 10px;
-      }
-      .panel {
-        width: 100%;
-        height: 100%;
-      }
-      .panel-body {
-        font-size: 16px;
-        font-size: 3.75vw;
-        text-align: center;
-        width: 100%;
-        height: 80%;
-        display: table;
-      }
-      .panel-body span {
-        display:table-cell;
-        vertical-align:middle;
-      }
     script.
       var widgets = !{JSON.stringify(dashboard.widgets)};
-
-      $(function(){
-        var socket = io('#{namespace}', {query: 'dashboard=#{dashboard.id}'});
-
-        socket
-          .on('connect', function(){
-            console.log('Connected to #{namespace}')
-          })
-          .on('widget:set', function(widget) {
-            widgets[widget.id] = widget;
-          });
-
-        Vue.component('dashboard-widget', {
-          props: ['widget'],
-          template: '#dashboard-widget',
-          computed: {
-            boxClass: function() {
-              return 'box box' + this.widget.id;
-            },
-            title: function() {
-              return 'Widget ' + this.widget.id;
-            }
-          }
+      var socket = io('#{namespace}', {query: 'dashboard=#{dashboard.id}'});
+      socket
+        .on('connect', function(){
+          console.log('Connected to #{namespace}')
+        })
+        .on('widget:set', function(widget) {
+          widgets[widget.id] = widget;
         });
+    script(src='/bundle.js')
 
-        Vue.component('count-up', {
-          props: ['value'],
-          template: '<span></span>',
-          mounted: function() {
-            this.countUp = new CountUp(this.$el, 0, this.value);
-            this.countUp.start();
-          },
-          watch: {
-            value: function() {
-              this.countUp.update(this.value);
-            }
-          }
-        });
-
-        var app = new Vue({
-          el: '#dashboard',
-          data: {
-            widgets: widgets
-          }
-        });
-      });
-  body
-    template#dashboard-widget
-      div(v-bind:class='[boxClass]')
-        .panel.panel-default
-          .panel-heading {{title}}
-          .panel-body
-            count-up(v-bind:value='widget.values.value')
-    #dashboard
-      .col1
-        dashboard-widget(v-bind:widget='widgets[1]')
-        dashboard-widget(v-bind:widget='widgets[2]')
-        dashboard-widget(v-bind:widget='widgets[3]')
-        dashboard-widget(v-bind:widget='widgets[4]')
-      .col2
-        dashboard-widget(v-bind:widget='widgets[6]')
-        dashboard-widget(v-bind:widget='widgets[5]')
-        dashboard-widget(v-bind:widget='widgets[8]')
-        dashboard-widget(v-bind:widget='widgets[9]')
-        dashboard-widget(v-bind:widget='widgets[10]')
-      dashboard-widget(v-bind:widget='widgets[7]')
-      dashboard-widget(v-bind:widget='widgets[11]')

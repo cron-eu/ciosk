@@ -18,17 +18,28 @@
     "dashboard"
   ],
   "devDependencies": {
+    "css-loader": "^0.26.1",
     "eslint": "^3.1.1",
     "eslint-config-xo-space": "^0.15.0",
+    "file-loader": "^0.10.0",
     "gulp": "^3.9.0",
+    "gulp-coveralls": "^0.1.0",
     "gulp-eslint": "^3.0.1",
     "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-line-ending-corrector": "^1.0.1",
     "gulp-istanbul": "^1.0.0",
+    "gulp-line-ending-corrector": "^1.0.1",
     "gulp-mocha": "^3.0.1",
-    "gulp-plumber": "^1.0.0",
     "gulp-nsp": "^2.1.0",
-    "gulp-coveralls": "^0.1.0"
+    "gulp-plumber": "^1.0.0",
+    "node-sass": "^4.5.0",
+    "pug": "^2.0.0-beta11",
+    "sass-loader": "^6.0.1",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "vue-loader": "^11.0.0",
+    "vue-style-loader": "^2.0.0",
+    "vue-template-compiler": "^2.1.10",
+    "webpack": "^2.2.1"
   },
   "eslintConfig": {
     "extends": "xo-space",
@@ -38,11 +49,14 @@
   },
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp"
+    "test": "gulp",
+    "build": "webpack --colors"
   },
   "private": true,
   "license": "UNLICENSED",
   "dependencies": {
+    "countup.js": "^1.8.1",
+    "flexboxgrid": "^6.3.1",
     "leitstand": "^0.1.1",
     "leitstand-faker": "^0.1.0",
     "leitstand-github": "^0.1.0",
@@ -53,6 +67,8 @@
     "leitstand-slack": "^0.1.0",
     "leitstand-socket.io": "^0.1.0",
     "leitstand-twitter": "^0.1.0",
+    "materialize-css": "^0.98.0",
+    "vue": "^2.1.10",
     "yargs": "^6.6.0"
   }
 }

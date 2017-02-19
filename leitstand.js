@@ -1,12 +1,13 @@
 var fs = require('fs');
 var path = require('path');
 var yargs = require('yargs');
+var express = require('express');
 
-module.exports = function (leitstand) {
+module.exports = function(leitstand) {
 
   var opts = yargs
-              .default('config', './config.json')
-              .argv;
+    .default('config', './config.json')
+    .argv;
 
   var config = path.resolve(opts.config);
 
@@ -17,12 +18,19 @@ module.exports = function (leitstand) {
   }
 
   leitstand
-    .plugin('socket.io', {
+    .plugin('jira', {
       settings: {
-        uri: 'http://localhost:9000/leitstand',
-        opts: {
-          query: 'dashboard=default'
+        host: 'cron-eu.atlassian.net',
+        basic_auth: {
+          username: opts['jira-username'],
+          password: opts['jira-password']
         }
+      }
+    })
+    .plugin('gitlab', {
+      settings: {
+        api: 'https://gitlab.cron.eu/api/v3',
+        privateToken: opts['gitlab-token']
       }
     })
     .plugin('twitter', {
@@ -43,24 +51,75 @@ module.exports = function (leitstand) {
         webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
       }
     })
-    .plugin('gitlab', {
-      settings: {
-        api: 'https://gitlab.cron.eu/api/v3',
-        privateToken: opts['gitlab-token']
-      }
-    })
-    .plugin('jira', {
-      settings: {
-        host: 'cron-eu.atlassian.net',
-        basic_auth: {
-          username: opts['jira-username'],
-          password: opts['jira-password']
-        }
-      }
-    })
     .plugin('faker', {
       settings: {
         locale: 'de'
+      }
+    })
+    .widget('gitlab-projects', {
+      plugin: 'gitlab',
+      methods: {
+        name: 'projects.list',
+        opts: {
+          per_page: 1000,
+          simple: true
+        },
+        key: 'projects',
+        schedule: '0 * * * *',
+        filter: function(values) {
+          var projects = this.widget.get().projects;
+
+          const holder = values.reduce(function(obj, project) {
+            obj[project.id] = project;
+            return obj;
+          }, {});
+
+          if (Object.keys(projects || {}).length !== values.length) {
+            var methods = [Object.assign(this.instance, {immediately: false})];
+
+            values.forEach(function(project) {
+              methods = methods.concat([
+                {
+                  name: 'issues.list',
+                  key: 'projects.' + project.id + '.open_issues'
+                },
+                {
+                  name: 'merge_requests.list',
+                  key: 'projects.' + project.id + '.open_merge_requests'
+                },
+              ].map(function(method) {
+                return Object.assign(method, {
+                  opts: {
+                    id: project.id,
+                    per_page: 1000,
+                    state: 'opened'
+                  },
+                  schedule: '*/10 * * * *'
+                });
+              }));
+            });
+
+            this.widget.methods = methods;
+            this.widget.work();
+          }
+
+          return holder;
+        }
+      }
+    })
+    .widget('open-jira-issues', {
+      methods: {
+        name: 'search.search',
+        plugin: 'jira',
+        opts: {
+          jql: 'status in (Open, "In Progress")',
+          maxResults: 0
+        }
+      },
+      filter: function(values) {
+        return {
+          count: values.total
+        };
       }
     })
     .widget('request-demo', {
@@ -69,16 +128,17 @@ module.exports = function (leitstand) {
         name: 'head',
         opts: 'http://cron.eu'
       },
-      filter: function (values) {
-        return values;
+      filter: function(values) {
+        return true;
       }
     })
     .widget('twitter-demo', {
-      methods: [
-      {
+      methods: [{
         plugin: 'twitter',
         name: 'get',
-        opts: ['statuses/user_timeline', {screen_name: 'cron_eu'}]
+        opts: ['statuses/user_timeline', {
+          screen_name: 'cron_eu'
+        }]
       }]
     })
     .widget('slack-demo', {
@@ -86,6 +146,7 @@ module.exports = function (leitstand) {
       plugin: 'slack',
       events: 'message'
     })
+
     /*
     .widget('mopidy', {
       schedule: false,
@@ -102,42 +163,23 @@ module.exports = function (leitstand) {
       events: 'event:volumeChanged'
     })
     */
-    .widget('gitlab-projects', {
-      plugin: 'gitlab',
-      methods: 'projects.list'
-    })
     .widget('github-events', {
       plugin: 'github',
-      methods: [
-      {
-        name: 'activity.getEventsForOrg',
-        opts: {
-          org: 'cron-eu'
+      methods: [{
+          name: 'activity.getEventsForOrg',
+          opts: {
+            org: 'cron-eu'
+          },
+          key: 'cron'
         },
-        key: 'cron'
-      },
-      {
-        name: 'activity.getEventsForOrg',
-        opts: {
-          org: 'leitstandjs'
-        },
-        key: 'leitstand'
-      }]
-    })
-    .widget('open-jira-issues', {
-      methods: {
-        name: 'search.search',
-        plugin: 'jira',
-        opts: {
-          jql: 'status in (Open, "In Progress")',
-          maxResults: 0
+        {
+          name: 'activity.getEventsForOrg',
+          opts: {
+            org: 'leitstandjs'
+          },
+          key: 'leitstand'
         }
-      },
-      filter: function(values) {
-        return {
-          open: values.total
-        };
-      }
+      ]
     })
     .widget('faker-widget', {
       schedule: false,
@@ -154,4 +196,6 @@ module.exports = function (leitstand) {
     .dashboard('default', {
       widgets: '.*'
     });
+
+  leitstand.app.use(express.static('dist'));
 };

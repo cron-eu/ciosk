@@ -8,6 +8,7 @@ First, install [leitstand-cli](https://npmjs.org/package/leitstand-cli) using [n
 ```bash
 git clone git@github.com:cron-eu/ciosk.git && cd ciosk
 npm install
+npm run build
 ```
 
 ## Usage

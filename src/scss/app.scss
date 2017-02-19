@@ -1,0 +1,64 @@
+@charset 'UTF-8';
+
+@import '~materialize-css/sass/components/color';
+@import '~materialize-css/sass/components/variables';
+@import '~materialize-css/sass/components/normalize';
+@import '~materialize-css/sass/components/typography';
+@import '~materialize-css/sass/components/global';
+$roboto-font-path: '~materialize-css/fonts/roboto/';
+@import '~materialize-css/sass/components/roboto';
+
+@import '~flexboxgrid/css/flexboxgrid';
+
+body {
+  background-color: color('blue-grey', 'lighten-1');
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#dashboard {
+  height: 100%;
+}
+
+.row {
+  width: 100%;
+  margin: 0;
+  padding: 1rem;
+}
+
+.col {
+  padding: 1rem;
+}
+
+.box {
+  margin: 0;
+  height: 100%;
+  background-color: color('blue-grey', 'darken-1');
+  border-radius: 2px;
+  @extend .z-depth-3;
+
+  > div {
+    width: 100%;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 2rem;
+    text-transform: uppercase;
+    color: color('orange', 'darken-1');
+    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
+  }
+  .countup {
+    font-size: 8rem;
+    font-weight: 900;
+    color: color('orange', 'base');
+    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
+  }
+}
+
+img {
+  width: 100%;
+}
