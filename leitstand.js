@@ -66,6 +66,9 @@ module.exports = function(leitstand) {
         },
         key: 'projects',
         schedule: '0 * * * *',
+        // this is necessary because the GitLab API does not provide an endpoint for fetching all issues / merge_requests globally
+        // those resources can only be requested per project
+        // see: https://docs.gitlab.com/ee/api/README.html
         filter: function(values) {
           var projects = this.widget.get().projects;
 
@@ -74,7 +77,7 @@ module.exports = function(leitstand) {
             return obj;
           }, {});
 
-          if (Object.keys(projects || {}).length !== values.length) {
+          if (projects && Object.keys(projects).length !== values.length) {
             var methods = [Object.assign(this.instance, {immediately: false})];
 
             values.forEach(function(project) {
@@ -165,6 +168,7 @@ module.exports = function(leitstand) {
     */
     .widget('github-events', {
       plugin: 'github',
+      schedule: '*/10 * * * *',
       methods: [{
           name: 'activity.getEventsForOrg',
           opts: {

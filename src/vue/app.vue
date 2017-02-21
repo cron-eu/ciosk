@@ -41,9 +41,10 @@ module.exports = {
       }
 
       var result = 0;
-      Object.keys(this.widgets['gitlab-projects']).forEach(function(project) {
+      Object.keys(this.widgets['gitlab-projects'].projects).forEach(function(id) {
+        var project = this.widgets['gitlab-projects'].projects[id];
         result += project.open_issues ? project.open_issues.length : 0;
-      });
+      }, this);
       return result;
     },
     openGitLabMergeRequests: function() {
@@ -52,9 +53,10 @@ module.exports = {
       }
 
       var result = 0;
-      Object.keys(this.widgets['gitlab-projects']).forEach(function(project) {
+      Object.keys(this.widgets['gitlab-projects'].projects).forEach(function(id) {
+        var project = this.widgets['gitlab-projects'].projects[id];
         result += project.open_merge_requests ? project.open_merge_requests.length : 0;
-      });
+      }, this);
       return result;
     }
   }
