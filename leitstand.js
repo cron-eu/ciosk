@@ -169,6 +169,12 @@ module.exports = function(leitstand) {
     .widget('github-events', {
       plugin: 'github',
       schedule: '*/10 * * * *',
+      settings: {
+        authenticate: {
+          type: 'token',
+          token: opts['github-token']
+        }
+      },
       methods: [{
           name: 'activity.getEventsForOrg',
           opts: {
