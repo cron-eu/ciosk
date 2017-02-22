@@ -22,6 +22,12 @@
           h2 Open GitLab Merge Requests
           p
             countup.countup.orange-text(v-bind:value='openGitLabMergeRequests')
+    .col.col-xs-12.col-md-2
+      .box.valign-wrapper
+        .valign.center-align
+          h2 Open GitHub Pull Requests
+          p
+            countup.countup.orange-text(v-bind:value='openGitHubPullRequests')
 </template>
 
 <script>
@@ -36,28 +42,19 @@ module.exports = {
   },
   computed: {
     openGitLabIssues: function() {
-      if (!this.widgets['gitlab-projects']) {
-        return 0;
-      }
-
-      var result = 0;
-      Object.keys(this.widgets['gitlab-projects'].projects).forEach(function(id) {
-        var project = this.widgets['gitlab-projects'].projects[id];
-        result += project.open_issues ? project.open_issues.length : 0;
-      }, this);
-      return result;
+      return this.widgets['gitlab-projects'] && this.widgets['gitlab-projects'].projects && Object.keys(this.widgets['gitlab-projects'].projects).reduce(function(obj, id) {
+        return obj + (this.widgets['gitlab-projects'].projects[id].open_issues || 0);
+      }, 0) || 0;
     },
     openGitLabMergeRequests: function() {
-      if (!this.widgets['gitlab-projects']) {
-        return 0;
-      }
-
-      var result = 0;
-      Object.keys(this.widgets['gitlab-projects'].projects).forEach(function(id) {
-        var project = this.widgets['gitlab-projects'].projects[id];
-        result += project.open_merge_requests ? project.open_merge_requests.length : 0;
-      }, this);
-      return result;
+      return this.widgets['gitlab-projects'] && this.widgets['gitlab-projects'].projects && Object.keys(this.widgets['gitlab-projects'].projects).reduce(function(obj, id) {
+        return obj + (this.widgets['gitlab-projects'].projects[id].open_merge_requests || 0);
+      }, 0) || 0;
+    },
+    openGitHubPullRequests: function() {
+      return this.widgets['github-repos'] && this.widgets['github-repos'].repos && Object.keys(this.widgets['github-repos'].repos).reduce(function(obj, id) {
+        return obj + (this.widgets['github-repos'].repos[id].open_pull_requests || 0);
+      }, 0) || 0;
     }
   }
 }

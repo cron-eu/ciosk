@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var yargs = require('yargs');
 var express = require('express');
+var _ = require('lodash');
 
 module.exports = function(leitstand) {
 
@@ -29,8 +30,16 @@ module.exports = function(leitstand) {
     })
     .plugin('gitlab', {
       settings: {
-        api: 'https://gitlab.cron.eu/api/v3',
-        privateToken: opts['gitlab-token']
+        url: 'https://gitlab.cron.eu',
+        token: opts['gitlab-token']
+      }
+    })
+    .plugin('github', {
+      settings: {
+        auth: {
+          type: 'token',
+          token: opts['github-token']
+        }
       }
     })
     .plugin('twitter', {
@@ -56,60 +65,6 @@ module.exports = function(leitstand) {
         locale: 'de'
       }
     })
-    .widget('gitlab-projects', {
-      plugin: 'gitlab',
-      methods: {
-        name: 'projects.list',
-        opts: {
-          per_page: 1000,
-          simple: true
-        },
-        key: 'projects',
-        schedule: '0 * * * *',
-        // this is necessary because the GitLab API does not provide an endpoint for fetching all issues / merge_requests globally
-        // those resources can only be requested per project
-        // see: https://docs.gitlab.com/ee/api/README.html
-        filter: function(values) {
-          var projects = this.widget.get().projects;
-
-          const holder = values.reduce(function(obj, project) {
-            obj[project.id] = project;
-            return obj;
-          }, {});
-
-          if (projects && Object.keys(projects).length !== values.length) {
-            var methods = [Object.assign(this.instance, {immediately: false})];
-
-            values.forEach(function(project) {
-              methods = methods.concat([
-                {
-                  name: 'issues.list',
-                  key: 'projects.' + project.id + '.open_issues'
-                },
-                {
-                  name: 'merge_requests.list',
-                  key: 'projects.' + project.id + '.open_merge_requests'
-                },
-              ].map(function(method) {
-                return Object.assign(method, {
-                  opts: {
-                    id: project.id,
-                    per_page: 1000,
-                    state: 'opened'
-                  },
-                  schedule: '*/10 * * * *'
-                });
-              }));
-            });
-
-            this.widget.methods = methods;
-            this.widget.work();
-          }
-
-          return holder;
-        }
-      }
-    })
     .widget('open-jira-issues', {
       methods: {
         name: 'search.search',
@@ -123,6 +78,117 @@ module.exports = function(leitstand) {
         return {
           count: values.total
         };
+      }
+    })
+    .widget('gitlab-projects', {
+      plugin: 'gitlab',
+      methods: {
+        name: 'projects.all',
+        opts: {
+          per_page: 1000
+        },
+        key: 'projects',
+        schedule: '0 * * * *',
+        // this is necessary because the GitLab API does not provide an endpoint for fetching all issues / merge_requests globally
+        // those resources can only be requested per project
+        // see: https://docs.gitlab.com/ee/api/README.html
+        filter: function(values) {
+          var projects = this.widget.get().projects;
+
+          const holder = values.reduce(function(obj, project) {
+            obj[project.path_with_namespace] = {id: project.id};
+            return obj;
+          }, {});
+
+          if (!projects || Object.keys(projects).length !== values.length) {
+            var methods = [Object.assign(this.instance, {immediately: false})];
+
+            values.forEach(function(project) {
+              methods = methods.concat([
+                {
+                  name: 'projects.issues.list',
+                  key: 'projects.' + project.path_with_namespace + '.open_issues'
+                },
+                {
+                  name: 'projects.merge_requests.list',
+                  key: 'projects.' + project.path_with_namespace + '.open_merge_requests'
+                },
+              ].map(function(method) {
+                return Object.assign(method, {
+                  opts: [
+                    project.id,
+                    {
+                      per_page: 1000,
+                      state: 'opened'
+                    }
+                  ],
+                  schedule: '*/10 * * * *',
+                  filter: function (values) {
+                    return values.length || 0;
+                  }
+                });
+              }));
+            });
+
+            this.widget.methods = methods;
+            this.widget.work();
+          }
+
+          return holder;
+        }
+      }
+    })
+    .widget('github-repos', {
+      plugin: 'github',
+      methods: {
+        name: 'orgs.getTeamRepos',
+        opts: {
+          org: 'cron-eu',
+          // cron-dev
+          id: '1247039',
+          per_page: 1000
+        },
+        key: 'repos',
+        schedule: '0 * * * *',
+        filter: function(values) {
+          var repos = this.widget.get().repos;
+
+          const holder = values.data.reduce(function(obj, repo) {
+            obj[repo.full_name] = {id: repo.id};
+            return obj;
+          }, {});
+
+          if (!repos || Object.keys(repos).length !== values.data.length) {
+            var methods = [Object.assign(this.instance, {immediately: false})];
+
+            values.data.forEach(function(repo) {
+              methods = methods.concat([
+                {
+                  name: 'pullRequests.getAll',
+                  key: 'repos.' + repo.full_name + '.open_pull_requests'
+                }
+              ].map(function(method) {
+                return Object.assign(method, {
+                  opts: {
+                    owner: repo.owner.login,
+                    repo: repo.name,
+                    per_page: 1000,
+                    state: 'open'
+                  },
+                  schedule: '*/10 * * * *',
+                  filter: function(values) {
+                    return values.data.length || 0;
+                  }
+                });
+              }));
+            });
+
+            this.widget.methods = methods;
+            this.widget.work();
+          }
+
+          return holder;
+        }
       }
     })
     .widget('request-demo', {
@@ -166,31 +232,6 @@ module.exports = function(leitstand) {
       events: 'event:volumeChanged'
     })
     */
-    .widget('github-events', {
-      plugin: 'github',
-      schedule: '*/10 * * * *',
-      settings: {
-        auth: {
-          type: 'token',
-          token: opts['github-token']
-        }
-      },
-      methods: [{
-          name: 'activity.getEventsForOrg',
-          opts: {
-            org: 'cron-eu'
-          },
-          key: 'cron'
-        },
-        {
-          name: 'activity.getEventsForOrg',
-          opts: {
-            org: 'leitstandjs'
-          },
-          key: 'leitstand'
-        }
-      ]
-    })
     .widget('faker-widget', {
       schedule: false,
       methods: {
