@@ -170,7 +170,7 @@ module.exports = function(leitstand) {
       plugin: 'github',
       schedule: '*/10 * * * *',
       settings: {
-        authenticate: {
+        auth: {
           type: 'token',
           token: opts['github-token']
         }
