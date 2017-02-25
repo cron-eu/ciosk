@@ -27,3 +27,11 @@ leitstand start \
 ```
 
 You can now visit the [default dashboard](http://localhost:9000/dashboards/default)
+
+## Development
+
+Assuming the **ciosk** project folder is located on the same level as one or more plugins, you can link them and / or **leitstand** itself like this:
+
+```bash
+npm link ../leitstand*
+```
