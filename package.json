@@ -39,7 +39,7 @@
   "dependencies": {
     "countup.js": "^1.8.1",
     "leitstand": "^0.1.1",
-    "leitstand-faker": "^0.1.0",
+    "leitstand-forecast": "^0.1.0",
     "leitstand-github": "^0.1.0",
     "leitstand-gitlab": "^0.1.0",
     "leitstand-jira": "^0.1.0",
@@ -50,6 +50,7 @@
     "leitstand-twitter": "^0.1.0",
     "materialize-css": "^0.98.0",
     "vue": "^2.1.10",
+    "weather-icons": "erikflowers/weather-icons",
     "yargs": "^6.6.0"
   }
 }

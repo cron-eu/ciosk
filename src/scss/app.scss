@@ -9,6 +9,9 @@ $roboto-font-path: '~materialize-css/fonts/roboto/';
 @import '~materialize-css/sass/components/roboto';
 @import '~materialize-css/sass/components/grid';
 
+$wi-path: '~weather-icons/font/';
+@import '~weather-icons/sass/weather-icons';
+
 body {
   background-color: color('blue-grey', 'lighten-1');
 }
@@ -50,16 +53,27 @@ html, body {
 
   h2 {
     font-weight: 500;
-    font-size: 2rem;
+    font-size: 1.6rem;
     text-transform: uppercase;
     color: color('orange', 'darken-1');
     text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
   }
-  .countup {
+  h3 {
+    color: color('orange', 'darken-1');
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+  .big {
+
+  }
+  .countup, .forecast i {
     font-size: 8rem;
     font-weight: 900;
     color: color('orange', 'base');
     text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
+  }
+  .degree:after {
+    content: '°';
   }
 }
 

@@ -40,6 +40,14 @@ module.exports = function (leitstand) {
         }
       }
     })
+    .plugin('forecast', {
+      settings: {
+        service: 'darksky',
+        key: opts['darksky-key'],
+        units: 'celcius',
+        lang: 'de'
+      }
+    })
     .plugin('twitter', {
       settings: {
         consumer_key: opts['twitter-consumer-key'],
@@ -56,11 +64,6 @@ module.exports = function (leitstand) {
     .plugin('mopidy', {
       settings: {
         webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
-      }
-    })
-    .plugin('faker', {
-      settings: {
-        locale: 'de'
       }
     })
     .widget('open-jira-issues', {
@@ -204,6 +207,38 @@ module.exports = function (leitstand) {
         }
       }
     })
+    .widget('forecast', {
+      plugin: 'forecast',
+      methods: {
+        name: 'get',
+        opts: [
+          // Stuttgart, Paulinenstraße 21, see: http://www.latlong.net/
+          [48.771371, 9.172061]
+        ],
+        key: 'forecast',
+        schedule: '*/10 * * * *',
+        filter: function (values) {
+          var base = {
+            location: 'Stuttgart, Paulinenstraße 21'
+          }
+
+          if (!values) {
+            return base
+          }
+
+          return Object.assign(base, values.currently, {
+            day: {
+              summary: values.hourly.summary,
+              icon: values.hourly.icon
+            },
+            week: {
+              summary: values.daily.summary,
+              icon: values.daily.icon
+            }
+          })
+        }
+      }
+    })
     .widget('request-demo', {
       plugin: 'request',
       methods: {
@@ -245,18 +280,6 @@ module.exports = function (leitstand) {
       events: 'event:volumeChanged'
     })
     */
-    .widget('faker-widget', {
-      schedule: false,
-      methods: {
-        name: 'fake',
-        plugin: 'faker',
-        opts: {
-          name: '{{name.lastName}}, {{name.firstName}} {{name.suffix}}',
-          company: '{{company.companyName}}, {{address.country}}',
-          motto: '{{hacker.phrase}}'
-        }
-      }
-    })
     .dashboard('default', {
       widgets: '.*'
     })
