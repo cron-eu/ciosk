@@ -96,7 +96,8 @@ module.exports = function(leitstand) {
           var projects = this.widget.get().projects;
 
           const holder = values.reduce(function(obj, project) {
-            obj[project.path_with_namespace] = {id: project.id};
+            var small = {id: project.id};
+            obj[project.path_with_namespace] = projects ? projects[project.id] || small  : small;
             return obj;
           }, {});
 
@@ -154,7 +155,8 @@ module.exports = function(leitstand) {
           var repos = this.widget.get().repos;
 
           const holder = values.data.reduce(function(obj, repo) {
-            obj[repo.full_name] = {id: repo.id};
+            var small = {id: repo.id}
+            obj[repo.full_name] = repos ? repos[repo.id] || small : small;
             return obj;
           }, {});
 
