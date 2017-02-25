@@ -19,18 +19,7 @@
   ],
   "devDependencies": {
     "css-loader": "^0.26.1",
-    "eslint": "^3.1.1",
-    "eslint-config-xo-space": "^0.15.0",
     "file-loader": "^0.10.0",
-    "gulp": "^3.9.0",
-    "gulp-coveralls": "^0.1.0",
-    "gulp-eslint": "^3.0.1",
-    "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-istanbul": "^1.0.0",
-    "gulp-line-ending-corrector": "^1.0.1",
-    "gulp-mocha": "^3.0.1",
-    "gulp-nsp": "^2.1.0",
-    "gulp-plumber": "^1.0.0",
     "node-sass": "^4.5.0",
     "pug": "^2.0.0-beta11",
     "sass-loader": "^6.0.1",
@@ -42,15 +31,7 @@
     "vue-template-compiler": "^2.1.10",
     "webpack": "^2.2.1"
   },
-  "eslintConfig": {
-    "extends": "xo-space",
-    "env": {
-      "mocha": true
-    }
-  },
   "scripts": {
-    "prepublish": "gulp prepublish",
-    "test": "gulp",
     "build": "webpack --colors"
   },
   "private": true,
