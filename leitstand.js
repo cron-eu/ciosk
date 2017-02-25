@@ -1,21 +1,19 @@
-var fs = require('fs');
-var path = require('path');
-var yargs = require('yargs');
-var express = require('express');
-var _ = require('lodash');
+var fs = require('fs')
+var path = require('path')
+var yargs = require('yargs')
+var express = require('express')
 
-module.exports = function(leitstand) {
-
+module.exports = function (leitstand) {
   var opts = yargs
     .default('config', './config.json')
-    .argv;
+    .argv
 
-  var config = path.resolve(opts.config);
+  var config = path.resolve(opts.config)
 
   if (fs.existsSync(config)) {
-    leitstand.logger.info('Loading config from "%s"', config);
-    config = require(config);
-    opts = Object.assign(config, opts);
+    leitstand.logger.info('Loading config from "%s"', config)
+    config = require(config)
+    opts = Object.assign(config, opts)
   }
 
   leitstand
@@ -74,10 +72,10 @@ module.exports = function(leitstand) {
           maxResults: 0
         }
       },
-      filter: function(values) {
+      filter: function (values) {
         return {
           count: values.total
-        };
+        }
       }
     })
     .widget('gitlab-projects', {
@@ -92,19 +90,19 @@ module.exports = function(leitstand) {
         // this is necessary because the GitLab API does not provide an endpoint for fetching all issues / merge_requests globally
         // those resources can only be requested per project
         // see: https://docs.gitlab.com/ee/api/README.html
-        filter: function(values) {
-          var projects = this.widget.get().projects;
+        filter: function (values) {
+          var projects = this.widget.get().projects
 
-          const holder = values.reduce(function(obj, project) {
-            var small = {id: project.id};
-            obj[project.path_with_namespace] = projects ? projects[project.id] || small  : small;
-            return obj;
-          }, {});
+          const holder = values.reduce(function (obj, project) {
+            var small = {id: project.id}
+            obj[project.path_with_namespace] = projects ? projects[project.id] || small : small
+            return obj
+          }, {})
 
           if (!projects || Object.keys(projects).length !== values.length) {
-            var methods = [Object.assign(this.instance, {immediately: false})];
+            var methods = [Object.assign(this.instance, {immediately: false})]
 
-            values.forEach(function(project) {
+            values.forEach(function (project) {
               methods = methods.concat([
                 {
                   name: 'projects.issues.list',
@@ -113,8 +111,8 @@ module.exports = function(leitstand) {
                 {
                   name: 'projects.merge_requests.list',
                   key: 'projects.' + project.path_with_namespace + '.open_merge_requests'
-                },
-              ].map(function(method) {
+                }
+              ].map(function (method) {
                 return Object.assign(method, {
                   opts: [
                     project.id,
@@ -125,17 +123,17 @@ module.exports = function(leitstand) {
                   ],
                   schedule: '*/10 * * * *',
                   filter: function (values) {
-                    return values.length || 0;
+                    return values.length || 0
                   }
-                });
-              }));
-            });
+                })
+              }))
+            })
 
-            this.widget.methods = methods;
-            this.widget.work();
+            this.widget.methods = methods
+            this.widget.work()
           }
 
-          return holder;
+          return holder
         }
       }
     })
@@ -151,25 +149,25 @@ module.exports = function(leitstand) {
         },
         key: 'repos',
         schedule: '0 * * * *',
-        filter: function(values) {
-          var repos = this.widget.get().repos;
+        filter: function (values) {
+          var repos = this.widget.get().repos
 
-          const holder = values.data.reduce(function(obj, repo) {
+          const holder = values.data.reduce(function (obj, repo) {
             var small = {id: repo.id}
-            obj[repo.full_name] = repos ? repos[repo.id] || small : small;
-            return obj;
-          }, {});
+            obj[repo.full_name] = repos ? repos[repo.id] || small : small
+            return obj
+          }, {})
 
           if (!repos || Object.keys(repos).length !== values.data.length) {
-            var methods = [Object.assign(this.instance, {immediately: false})];
+            var methods = [Object.assign(this.instance, {immediately: false})]
 
-            values.data.forEach(function(repo) {
+            values.data.forEach(function (repo) {
               methods = methods.concat([
                 {
                   name: 'pullRequests.getAll',
                   key: 'repos.' + repo.full_name + '.open_pull_requests'
                 }
-              ].map(function(method) {
+              ].map(function (method) {
                 return Object.assign(method, {
                   opts: {
                     owner: repo.owner.login,
@@ -178,18 +176,18 @@ module.exports = function(leitstand) {
                     state: 'open'
                   },
                   schedule: '*/10 * * * *',
-                  filter: function(values) {
-                    return values.data.length || 0;
+                  filter: function (values) {
+                    return values.data.length || 0
                   }
-                });
-              }));
-            });
+                })
+              }))
+            })
 
-            this.widget.methods = methods;
-            this.widget.work();
+            this.widget.methods = methods
+            this.widget.work()
           }
 
-          return holder;
+          return holder
         }
       }
     })
@@ -199,8 +197,8 @@ module.exports = function(leitstand) {
         name: 'head',
         opts: 'http://cron.eu'
       },
-      filter: function(values) {
-        return true;
+      filter: function (values) {
+        return true
       }
     })
     .widget('twitter-demo', {
@@ -248,7 +246,7 @@ module.exports = function(leitstand) {
     })
     .dashboard('default', {
       widgets: '.*'
-    });
+    })
 
-  leitstand.app.use(express.static('dist'));
-};
+  leitstand.app.use(express.static('dist'))
+}

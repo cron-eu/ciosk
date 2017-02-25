@@ -34,6 +34,7 @@
     "node-sass": "^4.5.0",
     "pug": "^2.0.0-beta11",
     "sass-loader": "^6.0.1",
+    "standard": "*",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "vue-loader": "^11.0.0",
