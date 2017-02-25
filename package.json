@@ -38,7 +38,6 @@
   "license": "UNLICENSED",
   "dependencies": {
     "countup.js": "^1.8.1",
-    "flexboxgrid": "^6.3.1",
     "leitstand": "^0.1.1",
     "leitstand-faker": "^0.1.0",
     "leitstand-github": "^0.1.0",

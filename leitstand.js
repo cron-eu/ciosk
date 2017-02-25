@@ -94,8 +94,7 @@ module.exports = function (leitstand) {
           var projects = this.widget.get().projects
 
           const holder = values.reduce(function (obj, project) {
-            var small = {id: project.id}
-            obj[project.path_with_namespace] = projects ? projects[project.id] || small : small
+            obj[project.path_with_namespace] = projects && projects[project.path_with_namespace] || {id: project.id}
             return obj
           }, {})
 
@@ -123,7 +122,7 @@ module.exports = function (leitstand) {
                   ],
                   schedule: '*/10 * * * *',
                   filter: function (values) {
-                    return values.length || 0
+                    return values && values.length || 0
                   }
                 })
               }))
@@ -134,6 +133,21 @@ module.exports = function (leitstand) {
           }
 
           return holder
+        }
+      }
+    })
+    .widget('open-github-issues', {
+      plugin: 'github',
+      methods: {
+        name: 'issues.getForOrg',
+        opts: {
+          org: 'cron-eu',
+          per_page: 1000
+        },
+        key: 'count',
+        schedule: '*/10 * * * *',
+        filter: function (values) {
+          return values.data.length || 0
         }
       }
     })
@@ -153,8 +167,7 @@ module.exports = function (leitstand) {
           var repos = this.widget.get().repos
 
           const holder = values.data.reduce(function (obj, repo) {
-            var small = {id: repo.id}
-            obj[repo.full_name] = repos ? repos[repo.id] || small : small
+            obj[repo.full_name] = repos && repos[repo.full_name] || {id: repo.id}
             return obj
           }, {})
 
@@ -177,7 +190,7 @@ module.exports = function (leitstand) {
                   },
                   schedule: '*/10 * * * *',
                   filter: function (values) {
-                    return values.data.length || 0
+                    return values && values.data.length || 0
                   }
                 })
               }))
