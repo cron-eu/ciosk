@@ -244,20 +244,34 @@ module.exports = function (leitstand) {
     })
     .widget('slack', {
       values: {
-        message: 'Post a message like "<strong>@leitstand</strong> **Hello World**" (Markdown filtered)'
+        welcome: 'Post a message like "<strong>@leitstand:welcome</strong> **Hello World**" (Markdown filtered)'
       },
       plugin: 'slack',
       events: [
         {
           // see https://github.com/slackapi/node-slack-sdk/blob/master/lib/clients/events/rtm.js
           name: 'message',
-          key: 'message',
           filter: function (message) {
-            var trigger = '@leitstand'
-            if (!message.text || !message.text.startsWith(trigger)) {
-              return this.widget.get().message
+            var matches
+            if (!message.text || !(matches = /@leitstand:(welcome|twitter)(.*)/g.exec(message.text))) {
+              return this.widget.get()
             }
-            return md.render(message.text.substring(trigger.length).trim())
+
+            matches[2] = matches[2].trim()
+
+            if (matches[1] === 'welcome') {
+              matches[2] = md.render(matches[2])
+            } else if (matches[1] === 'twitter') {
+              var methods = leitstand.widgets['twitter'].methods
+              var search = methods[0].instance
+              search.opts[1].q = matches[2]
+              leitstand.widgets['twitter'].methods = search
+              leitstand.widgets['twitter'].work()
+            }
+
+            var result = {}
+            result[matches[1]] = matches[2]
+            return result
           }
         }
       ]
@@ -303,24 +317,18 @@ module.exports = function (leitstand) {
         }
       ]
     })
-    .widget('request-demo', {
-      plugin: 'request',
+    .widget('twitter', {
       methods: {
-        name: 'head',
-        opts: 'http://cron.eu'
-      },
-      filter: function (values) {
-        return true
-      }
-    })
-    .widget('twitter-demo', {
-      methods: [{
         plugin: 'twitter',
         name: 'get',
-        opts: ['statuses/user_timeline', {
-          screen_name: 'cron_eu'
-        }]
-      }]
+        opts: [
+          'search/tweets',
+          {
+            q: 'from:cron_eu',
+            count: 3
+          }
+        ]
+      }
     })
     .dashboard('default', {
       widgets: '.*'

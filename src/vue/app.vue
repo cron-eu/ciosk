@@ -43,7 +43,7 @@
       .box.valign-wrapper
         .valign.center-align
           transition(mode='out-in', enter-active-class='animated wobble', leave-active-class='animated zoomOut')
-            .message(v-html='message', v-bind:key='message')
+            .message(v-html='welcome', v-bind:key='welcome')
 </template>
 
 <script>
@@ -82,8 +82,8 @@ module.exports = {
     forecast: function() {
       return this.widgets['forecast'].forecast;
     },
-    message: function() {
-      return this.widgets['slack'].message;
+    welcome: function() {
+      return this.widgets['slack'].welcome;
     }
   }
 }
