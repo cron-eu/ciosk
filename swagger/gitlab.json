@@ -1,0 +1,115 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3",
+    "title": "GitLab API"
+  },
+  "host": "gitlab.cron.eu",
+  "basePath": "/api/v3",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "privateTokenQuery": {
+      "type": "apiKey",
+      "name": "private_token",
+      "in": "query"
+    },
+    "privateTokenHeader": {
+      "type": "apiKey",
+      "name": "PRIVATE-TOKEN",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/projects": {
+      "get": {
+        "operationId": "listProjects",
+        "tags": [
+          "projects"
+        ],
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/projects/{id}/merge_requests": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "listMergeRequests",
+        "tags": [
+          "projects"
+        ],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "enum": [
+              "all",
+              "merged",
+              "opened",
+              "closed"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/projects/{id}/issues": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "listIssues",
+        "tags": [
+          "projects"
+        ],
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "enum": [
+              "all",
+              "merged",
+              "opened",
+              "closed"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

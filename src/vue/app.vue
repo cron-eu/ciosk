@@ -34,10 +34,15 @@
           h2 GitHub Pull Requests
           p
             countup.countup(v-bind:value='openGitHubPullRequests')
-    .col.s2
+  .row.h25
+    .col.s3
       .box.valign-wrapper
         .valign.center-align
           forecast.forecast(v-bind:forecast='forecast')
+    .col.s6
+      .box.valign-wrapper
+        .valign.center-align
+          .message(v-html='message')
 </template>
 
 <script>
@@ -74,7 +79,10 @@ module.exports = {
       }, 0) || 0;
     },
     forecast: function() {
-      return this.widgets['forecast'].forecast || 0;
+      return this.widgets['forecast'].forecast;
+    },
+    message: function() {
+      return this.widgets['slack'].message;
     }
   }
 }

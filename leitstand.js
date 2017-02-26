@@ -2,6 +2,11 @@ var fs = require('fs')
 var path = require('path')
 var yargs = require('yargs')
 var express = require('express')
+var md = require('markdown-it')()
+var emoji = require('markdown-it-emoji')
+var SwaggerAuth = require('swagger-client').ApiKeyAuthorization;
+
+md.use(emoji)
 
 module.exports = function (leitstand) {
   var opts = yargs
@@ -26,12 +31,6 @@ module.exports = function (leitstand) {
         }
       }
     })
-    .plugin('gitlab', {
-      settings: {
-        url: 'https://gitlab.cron.eu',
-        token: opts['gitlab-token']
-      }
-    })
     .plugin('github', {
       settings: {
         auth: {
@@ -48,17 +47,17 @@ module.exports = function (leitstand) {
         lang: 'de'
       }
     })
+    .plugin('slack', {
+      settings: {
+        botToken: opts['slack-bot-token']
+      }
+    })
     .plugin('twitter', {
       settings: {
         consumer_key: opts['twitter-consumer-key'],
         consumer_secret: opts['twitter-consumer-secret'],
         access_token_key: opts['twitter-access-token-key'],
         access_token_secret: opts['twitter-access-token-secret']
-      }
-    })
-    .plugin('slack', {
-      settings: {
-        botToken: opts['slack-bot-token']
       }
     })
     .plugin('mopidy', {
@@ -82,13 +81,20 @@ module.exports = function (leitstand) {
       }
     })
     .widget('gitlab-projects', {
-      plugin: 'gitlab',
+      plugin: 'swagger',
+      settings: {
+        spec: require('./swagger/gitlab.json'),
+        usePromise: true,
+        authorizations : {
+          privateTokenHeader: new SwaggerAuth('PRIVATE-TOKEN', opts['gitlab-token'], 'header')
+        }
+      },
       methods: {
-        name: 'projects.all',
+        name: 'projects.listProjects',
+        key: 'projects',
         opts: {
           per_page: 1000
         },
-        key: 'projects',
         schedule: '0 * * * *',
         // this is necessary because the GitLab API does not provide an endpoint for fetching all issues / merge_requests globally
         // those resources can only be requested per project
@@ -96,36 +102,33 @@ module.exports = function (leitstand) {
         filter: function (values) {
           var projects = this.widget.get().projects
 
-          const holder = values.reduce(function (obj, project) {
+          const holder = values.obj.reduce(function (obj, project) {
             obj[project.path_with_namespace] = projects && projects[project.path_with_namespace] || {id: project.id}
             return obj
           }, {})
 
-          if (!projects || Object.keys(projects).length !== values.length) {
+          if (!projects || Object.keys(projects).length !== values.obj.length) {
             var methods = [Object.assign(this.instance, {immediately: false})]
 
-            values.forEach(function (project) {
+            values.obj.forEach(function (project) {
               methods = methods.concat([
                 {
-                  name: 'projects.issues.list',
+                  name: 'projects.listIssues',
                   key: 'projects.' + project.path_with_namespace + '.open_issues'
                 },
                 {
-                  name: 'projects.merge_requests.list',
+                  name: 'projects.listMergeRequests',
                   key: 'projects.' + project.path_with_namespace + '.open_merge_requests'
                 }
               ].map(function (method) {
                 return Object.assign(method, {
-                  opts: [
-                    project.id,
-                    {
-                      per_page: 1000,
-                      state: 'opened'
-                    }
-                  ],
+                  opts: {
+                    id: project.id,
+                    state: 'opened'
+                  },
                   schedule: '*/10 * * * *',
                   filter: function (values) {
-                    return values && values.length || 0
+                    return values && parseInt(values.headers['x-total']) || 0
                   }
                 })
               }))
@@ -239,6 +242,26 @@ module.exports = function (leitstand) {
         }
       }
     })
+    .widget('slack', {
+      values: {
+        message: 'Post a message like "<strong>@leitstand</strong> **Hello World**" (Markdown filtered)'
+      },
+      plugin: 'slack',
+      events: [
+        {
+          // see https://github.com/slackapi/node-slack-sdk/blob/master/lib/clients/events/rtm.js
+          name: 'message',
+          key: 'message',
+          filter: function (message) {
+            var trigger = '@leitstand'
+            if (!message.text || !message.text.startsWith(trigger)) {
+              return this.widget.get().message
+            }
+            return md.render(message.text.substring(trigger.length).trim())
+          }
+        }
+      ]
+    })
     .widget('request-demo', {
       plugin: 'request',
       methods: {
@@ -257,11 +280,6 @@ module.exports = function (leitstand) {
           screen_name: 'cron_eu'
         }]
       }]
-    })
-    .widget('slack-demo', {
-      // see https://github.com/slackapi/node-slack-sdk/blob/master/lib/clients/events/rtm.js
-      plugin: 'slack',
-      events: 'message'
     })
 
     /*
