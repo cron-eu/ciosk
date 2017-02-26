@@ -37,6 +37,7 @@
   "private": true,
   "license": "UNLICENSED",
   "dependencies": {
+    "animate.css": "^3.5.2",
     "countup.js": "^1.8.1",
     "leitstand": "^0.1.1",
     "leitstand-forecast": "^0.1.0",

@@ -42,7 +42,8 @@
     .col.s6
       .box.valign-wrapper
         .valign.center-align
-          .message(v-html='message')
+          transition(mode='out-in', enter-active-class='animated wobble', leave-active-class='animated zoomOut')
+            .message(v-html='message', v-bind:key='message')
 </template>
 
 <script>

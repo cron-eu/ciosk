@@ -4,7 +4,7 @@ var yargs = require('yargs')
 var express = require('express')
 var md = require('markdown-it')()
 var emoji = require('markdown-it-emoji')
-var SwaggerAuth = require('swagger-client').ApiKeyAuthorization;
+var SwaggerAuth = require('swagger-client').ApiKeyAuthorization
 
 md.use(emoji)
 
@@ -52,17 +52,17 @@ module.exports = function (leitstand) {
         botToken: opts['slack-bot-token']
       }
     })
+    .plugin('mopidy', {
+      settings: {
+        webSocketUrl: opts['mopidy-url'] || 'ws://localhost:6680/mopidy/ws/'
+      }
+    })
     .plugin('twitter', {
       settings: {
         consumer_key: opts['twitter-consumer-key'],
         consumer_secret: opts['twitter-consumer-secret'],
         access_token_key: opts['twitter-access-token-key'],
         access_token_secret: opts['twitter-access-token-secret']
-      }
-    })
-    .plugin('mopidy', {
-      settings: {
-        webSocketUrl: 'ws://192.168.36.217:6680/mopidy/ws/'
       }
     })
     .widget('open-jira-issues', {
@@ -85,7 +85,7 @@ module.exports = function (leitstand) {
       settings: {
         spec: require('./swagger/gitlab.json'),
         usePromise: true,
-        authorizations : {
+        authorizations: {
           privateTokenHeader: new SwaggerAuth('PRIVATE-TOKEN', opts['gitlab-token'], 'header')
         }
       },
@@ -262,6 +262,47 @@ module.exports = function (leitstand) {
         }
       ]
     })
+    .widget('mopidy', {
+      schedule: false,
+      plugin: 'mopidy',
+      methods: [
+        {
+          name: 'mixer.getVolume',
+          key: 'volume'
+        },
+        {
+          name: 'playback.getCurrentTlTrack',
+          key: 'track'
+        },
+        {
+          name: 'playback.getState',
+          key: 'state'
+        }
+      ],
+      events: [
+        {
+          name: 'event:volumeChanged',
+          key: 'volume',
+          filter: function (event) {
+            return event.volume
+          }
+        },
+        {
+          name: 'event:trackPlaybackStarted',
+          key: 'track',
+          filter: function (event) {
+            return event.tl_track
+          }
+        },
+        {
+          name: 'event:playbackStateChanged',
+          key: 'state',
+          filter: function (event) {
+            return event.new_state
+          }
+        }
+      ]
+    })
     .widget('request-demo', {
       plugin: 'request',
       methods: {
@@ -281,23 +322,6 @@ module.exports = function (leitstand) {
         }]
       }]
     })
-
-    /*
-    .widget('mopidy', {
-      schedule: false,
-      plugin: 'mopidy',
-      methods: [
-      {
-        name: 'mixer.getVolume',
-        key: 'volume'
-      },
-      {
-        name: 'playback.getCurrentTlTrack',
-        key: 'track'
-      }],
-      events: 'event:volumeChanged'
-    })
-    */
     .dashboard('default', {
       widgets: '.*'
     })
