@@ -12,7 +12,10 @@ $roboto-font-path: '~materialize-css/fonts/roboto/';
 $wi-path: '~weather-icons/font/';
 @import '~weather-icons/sass/weather-icons';
 
-@import '~animate.css/animate.css';
+@import '~weather-icons/sass/weather-icons';
+
+$fa-font-path: '~font-awesome/fonts/';
+@import '~font-awesome/scss/font-awesome';
 
 body {
   background-color: color('blue-grey', 'lighten-1');
@@ -25,12 +28,12 @@ html, body {
 
 #dashboard {
   height: 100%;
+  padding: 1rem;
 }
 
 .row {
   width: 100%;
   margin: 0;
-  padding: 1rem;
 
   > .col {
     padding: 1rem;
@@ -40,6 +43,10 @@ html, body {
 
 .h25 {
   height: 25%;
+}
+
+.h50 {
+  height: 50%;
 }
 
 .box {
@@ -53,22 +60,21 @@ html, body {
     width: 100%;
   }
 
+  h2, h3, .message {
+    color: color('orange', 'darken-1');
+    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
+  }
   h2 {
     font-weight: 500;
     font-size: 1.6rem;
     text-transform: uppercase;
-    color: color('orange', 'darken-1');
-    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
   }
   h3 {
-    color: color('orange', 'darken-1');
-    font-size: 1.5rem;
+    font-size: 2.3rem;
     font-weight: 400;
   }
   .message {
     font-size: 3.5rem;
-    color: color('orange', 'darken-1');
-    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
     strong {
       font-weight: 900;
     }

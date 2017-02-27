@@ -44,6 +44,25 @@
         .valign.center-align
           transition(mode='out-in', enter-active-class='animated wobble', leave-active-class='animated zoomOut')
             .message(v-html='welcome', v-bind:key='welcome')
+    .col.s3
+      .box.valign-wrapper
+        .valign.center-align
+          transition(mode='out-in', enter-active-class='animated wobble', leave-active-class='animated zoomOut')
+            mopidy(v-bind:mopidy='mopidy', v-bind:key='mopidy.track.name')
+  .row.h50
+    .col.s4
+      .box.valign-wrapper
+        .valign.center-align
+          h2 GitHub Events
+    .col.s4
+      .box.valign-wrapper
+        .valign.center-align
+          h2 Twitter
+          span(v-if='twitterQuery') / {{ twitterQuery }}
+    .col.s4
+      .box.valign-wrapper
+        .valign.center-align
+          h2 GitLab Events
 </template>
 
 <script>
@@ -55,7 +74,8 @@ module.exports = {
   },
   components: {
     countup: require('./countup.vue'),
-    forecast: require('./forecast.vue')
+    forecast: require('./forecast.vue'),
+    mopidy: require('./mopidy.vue')
   },
   computed: {
     openJIRAIssues: function() {
@@ -84,6 +104,12 @@ module.exports = {
     },
     welcome: function() {
       return this.widgets['slack'].welcome;
+    },
+    twitterQuery: function() {
+      return this.widgets['slack'].twitter;
+    },
+    mopidy: function() {
+      return this.widgets['mopidy'];
     }
   }
 }

@@ -32,13 +32,15 @@
     "webpack": "^2.2.1"
   },
   "scripts": {
-    "postinstall": "webpack --colors"
+    "postinstall": "npm run build",
+    "build": "webpack --colors"
   },
   "private": true,
   "license": "UNLICENSED",
   "dependencies": {
     "animate.css": "^3.5.2",
     "countup.js": "^1.8.1",
+    "font-awesome": "^4.7.0",
     "leitstand": "^0.1.1",
     "leitstand-forecast": "^0.1.0",
     "leitstand-github": "^0.1.0",

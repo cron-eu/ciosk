@@ -286,7 +286,10 @@ module.exports = function (leitstand) {
         },
         {
           name: 'playback.getCurrentTlTrack',
-          key: 'track'
+          key: 'track',
+          filter: function (tlTrack) {
+            return tlTrack && tlTrack.track
+          }
         },
         {
           name: 'playback.getState',
@@ -305,7 +308,7 @@ module.exports = function (leitstand) {
           name: 'event:trackPlaybackStarted',
           key: 'track',
           filter: function (event) {
-            return event.tl_track
+            return event.tl_track && event.tl_track.track
           }
         },
         {
