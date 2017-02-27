@@ -28,3 +28,9 @@ Assuming the **ciosk** project folder is located on the same level as one or mor
 ```bash
 npm link ../leitstand*
 ```
+
+To bundle frontend stuff:
+
+```bash
+npm run build
+```
