@@ -32,7 +32,7 @@
     "webpack": "^2.2.1"
   },
   "scripts": {
-    "build": "webpack --colors"
+    "postinstall": "webpack --colors"
   },
   "private": true,
   "license": "UNLICENSED",
