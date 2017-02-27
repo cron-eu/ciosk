@@ -17,6 +17,10 @@ $wi-path: '~weather-icons/font/';
 $fa-font-path: '~font-awesome/fonts/';
 @import '~font-awesome/scss/font-awesome';
 
+@mixin text-shadow() {
+  text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
+}
+
 body {
   background-color: color('blue-grey', 'lighten-1');
 }
@@ -60,9 +64,9 @@ html, body {
     width: 100%;
   }
 
-  h2, h3, .message {
+  h2, h3, .welcome, .countup, .forecast i, .collection-item > p {
     color: color('orange', 'darken-1');
-    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
+    @include text-shadow();
   }
   h2 {
     font-weight: 500;
@@ -73,7 +77,7 @@ html, body {
     font-size: 2.3rem;
     font-weight: 400;
   }
-  .message {
+  .welcome {
     font-size: 3.5rem;
     strong {
       font-weight: 900;
@@ -82,14 +86,29 @@ html, body {
   .countup, .forecast i {
     font-size: 8rem;
     font-weight: 900;
-    color: color('orange', 'base');
-    text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);
   }
   .degree:after {
     content: '°';
   }
-}
-
-img {
-  width: 100%;
+  .collection {
+    border: none;
+    .collection-item {
+      padding-left: 130px;
+      background: none;
+      border: none;
+      &.avatar .circle {
+        width: 80px;
+        height: 80px;
+      }
+      .title {
+        font-size: 1.7rem;
+        color: #AAB700;
+        @include text-shadow();
+      }
+      > p {
+        font-size: 2rem;
+        line-height: 2.4rem;
+      }
+    }
+  }
 }

@@ -3,7 +3,7 @@
   .row.h25
     .col.s2
       .box.valign-wrapper
-        img.valign(src='../img/cron-logo-cmyk.svg')
+        img.responsive-img.valign(src='../img/cron-logo-cmyk.svg')
     .col.s2
       .box.valign-wrapper
         .valign.center-align
@@ -43,26 +43,28 @@
       .box.valign-wrapper
         .valign.center-align
           transition(mode='out-in', enter-active-class='animated wobble', leave-active-class='animated zoomOut')
-            .message(v-html='welcome', v-bind:key='welcome')
+            .welcome(v-html='welcome', v-bind:key='welcome')
     .col.s3
       .box.valign-wrapper
         .valign.center-align
           transition(mode='out-in', enter-active-class='animated wobble', leave-active-class='animated zoomOut')
-            mopidy(v-bind:mopidy='mopidy', v-bind:key='mopidy.track.name')
+            mopidy(v-bind:mopidy='mopidy')
   .row.h50
     .col.s4
       .box.valign-wrapper
-        .valign.center-align
-          h2 GitHub Events
+        .valign
+          h2.center-align GitHub Events
+          feed(v-bind:items='gitHubFeed')
     .col.s4
       .box.valign-wrapper
-        .valign.center-align
-          h2 Twitter
-          span(v-if='twitterQuery') / {{ twitterQuery }}
+        .valign
+          h2.center-align Twitter
+          feed(v-bind:items='twitterFeed')
     .col.s4
       .box.valign-wrapper
-        .valign.center-align
-          h2 GitLab Events
+        .valign
+          h2.center-align GitLab Events
+          feed(v-bind:items='gitLabFeed')
 </template>
 
 <script>
@@ -75,7 +77,8 @@ module.exports = {
   components: {
     countup: require('./countup.vue'),
     forecast: require('./forecast.vue'),
-    mopidy: require('./mopidy.vue')
+    mopidy: require('./mopidy.vue'),
+    feed: require('./feed.vue')
   },
   computed: {
     openJIRAIssues: function() {
@@ -98,6 +101,15 @@ module.exports = {
       return this.widgets['github-repos'] && this.widgets['github-repos'].repos && Object.keys(this.widgets['github-repos'].repos).reduce(function(obj, id) {
         return obj + (this.widgets['github-repos'].repos[id].open_pull_requests || 0);
       }, 0) || 0;
+    },
+    gitHubFeed: function() {
+      return this.widgets['github-feed'] && this.widgets['github-feed'].entries || [];
+    },
+    twitterFeed: function() {
+      return this.widgets['twitter-feed'] && this.widgets['twitter-feed'].entries || [];
+    },
+    gitLabFeed: function() {
+      return this.widgets['gitlab-feed'] && this.widgets['gitlab-feed'].entries || [];
     },
     forecast: function() {
       return this.widgets['forecast'].forecast;

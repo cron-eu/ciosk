@@ -5,7 +5,9 @@
   "twitter-access-token-secret": "",
   "slack-bot-token": "",
   "github-token": "",
+  "github-feed-token": "",
   "gitlab-token": "",
+  "gitlab-feed-token": "",
   "jira-username": "",
   "jira-password": "",
   "darksky-key": ""

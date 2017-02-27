@@ -4,6 +4,7 @@ var yargs = require('yargs')
 var express = require('express')
 var md = require('markdown-it')()
 var emoji = require('markdown-it-emoji')
+var parseString = require('xml2js').parseString
 var SwaggerAuth = require('swagger-client').ApiKeyAuthorization
 
 md.use(emoji)
@@ -44,7 +45,7 @@ module.exports = function (leitstand) {
         service: 'darksky',
         key: opts['darksky-key'],
         units: 'celcius',
-        lang: 'de'
+        lang: 'en'
       }
     })
     .plugin('slack', {
@@ -210,6 +211,40 @@ module.exports = function (leitstand) {
         }
       }
     })
+    .widget('github-feed', {
+      plugin: 'request',
+      methods: {
+        name: 'get',
+        opts: {
+          uri: 'https://github.com/organizations/cron-eu/100hz.private.atom',
+          qs: {
+            token: opts['github-feed-token']
+          }
+        },
+        callback: function (error, response, body) {
+          if (error) {
+            return
+          }
+
+          parseString(body, function (err, result) {
+            if (err) {
+              this.logger.warn('Could not convert GitHub feed to JSON')
+            }
+
+            var entries = result.feed.entry.slice(0, 3).map(function(entry) {
+              return {
+                author: entry.author[0].name[0],
+                avatar: entry['media:thumbnail'][0]['$'].url + '0',
+                title: entry.title[0]._,
+                time: entry.updated[0]
+              }
+            })
+
+            this.widget.set(entries, 'entries')
+          }.bind(this))
+        }
+      }
+    })
     .widget('forecast', {
       plugin: 'forecast',
       methods: {
@@ -320,17 +355,67 @@ module.exports = function (leitstand) {
         }
       ]
     })
-    .widget('twitter', {
+    .widget('twitter-feed', {
       methods: {
         plugin: 'twitter',
         name: 'get',
         opts: [
           'search/tweets',
           {
-            q: 'from:cron_eu',
+            q: 'from:heisedc',
             count: 3
           }
         ]
+      },
+      callback: function (error, response) {
+        if (error) {
+          return
+        }
+
+        var entries = response.statuses.slice(0, 3).map(function(entry) {
+          return {
+            author: entry.user.screen_name,
+            avatar: entry.user.profile_image_url,
+            title: entry.text,
+            time: entry.created_at
+          }
+        })
+
+        this.widget.set(entries, 'entries')
+      }
+    })
+    .widget('gitlab-feed', {
+      plugin: 'request',
+      methods: {
+        name: 'get',
+        opts: {
+          uri: 'https://gitlab.cron.eu/dashboard/projects.atom',
+          qs: {
+            private_token: opts['gitlab-feed-token']
+          }
+        },
+        callback: function (error, response, body) {
+          if (error) {
+            return
+          }
+
+          parseString(body, function (err, result) {
+            if (err) {
+              this.logger.warn('Could not convert GitLab feed to JSON')
+            }
+
+            var entries = result.feed.entry.slice(0, 3).map(function(entry) {
+              return {
+                author: entry.author[0].name[0],
+                avatar: entry['media:thumbnail'][0]['$'].url,
+                title: entry.title[0],
+                time: entry.updated[0]
+              }
+            })
+
+            this.widget.set(entries, 'entries')
+          }.bind(this))
+        }
       }
     })
     .dashboard('default', {

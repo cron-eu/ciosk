@@ -8,7 +8,7 @@ div
     br
     | by {{ mopidy.track.artists.map(function(artist) { return artist.name; }).join(', ') }}
   h3(v-else='')
-    | Kein Track in Tracklist
+    | No track in tracklist
 </template>
 
 <script>
