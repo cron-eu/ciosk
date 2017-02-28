@@ -11,7 +11,7 @@ module.exports = {
   methods: {
     moment: function() {
       this.representation = moment(this.time).fromNow();
-      setInterval(this.moment.bind(this), 1000);
+      setTimeout(this.moment.bind(this), 1000);
     }
   },
   mounted: function() {
