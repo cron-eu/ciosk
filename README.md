@@ -34,3 +34,9 @@ To bundle frontend stuff:
 ```bash
 npm run build
 ```
+
+To debug / inspect the app:
+
+```bash
+node --inspect-brk $(which leitstand) start
+```
