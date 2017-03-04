@@ -377,7 +377,7 @@ module.exports = function (leitstand) {
             author: entry.user.screen_name,
             avatar: entry.user.profile_image_url,
             title: entry.text,
-            time: entry.created_at
+            time: new Date(entry.created_at)
           }
         })
 
