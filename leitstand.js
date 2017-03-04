@@ -223,12 +223,14 @@ module.exports = function (leitstand) {
         },
         callback: function (error, response, body) {
           if (error) {
+            this.logger.error('Could not fetch GitHub feed', error)
             return
           }
 
           parseString(body, function (err, result) {
             if (err) {
-              this.logger.warn('Could not convert GitHub feed to JSON')
+              this.logger.error('Could not convert GitHub feed to JSON', err)
+              return
             }
 
             var entries = result.feed.entry.slice(0, 3).map(function(entry) {
@@ -369,6 +371,7 @@ module.exports = function (leitstand) {
       },
       callback: function (error, response) {
         if (error) {
+          this.logger.error('Could not fetch Twitter feed', error)
           return
         }
 
@@ -396,12 +399,14 @@ module.exports = function (leitstand) {
         },
         callback: function (error, response, body) {
           if (error) {
+            this.logger.error('Could not fetch GitLab feed', error)
             return
           }
 
           parseString(body, function (err, result) {
             if (err) {
-              this.logger.warn('Could not convert GitLab feed to JSON')
+              this.logger.error('Could not convert GitLab feed to JSON', err)
+              return
             }
 
             var entries = result.feed.entry.slice(0, 3).map(function(entry) {
